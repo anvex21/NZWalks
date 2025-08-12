@@ -9,9 +9,8 @@ namespace NZWalks.API.Data
         /// Constructor
         /// </summary>
         /// <param name="dbContextOptions"></param>
-        public NZWalksDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        public NZWalksDbContext(DbContextOptions<NZWalksDbContext> options) : base(options)
         {
-
         }
         /// <summary>
         /// DbSet Difficulties
