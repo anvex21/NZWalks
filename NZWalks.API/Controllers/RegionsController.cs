@@ -74,7 +74,7 @@ namespace NZWalks.API.Controllers
             await _context.SaveChangesAsync();
             // map entity to dto
             RegionDto regionDto = _mapper.Map<RegionDto>(region);
-            return CreatedAtAction(nameof(GetById),new {id = regionDto .Id}, regionDto);
+            return CreatedAtAction(nameof(GetById),new {id = regionDto.Id}, regionDto);
         }
 
         /// <summary>
