@@ -1,9 +1,11 @@
 ﻿ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.Configuration;
 using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTOs;
+using NZWalks.API.Repositories;
 
 namespace NZWalks.API.Controllers
 {
@@ -12,20 +14,22 @@ namespace NZWalks.API.Controllers
     public class RegionsController : ControllerBase
     {
         private readonly NZWalksDbContext _context;
-        public RegionsController(NZWalksDbContext context)
+        private readonly IRegionRepository _regionRepository;
+        public RegionsController(NZWalksDbContext context, IRegionRepository regionRepository)
         {
             _context = context;
+            _regionRepository = regionRepository;
         }
 
         /// <summary>
         /// Get all regions
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GetAllRegions")]
+        [HttpGet("GetAllRegions")] 
         public async Task<IActionResult> GetAll()
         {
             //List<Region> regionsEntity = await _context.Regions.ToList(); when not using await 
-            List<Region> regionsEntity = await _context.Regions.ToListAsync();
+            List<Region> regionsEntity = await _regionRepository.GetAllAsync();
             List<RegionDto> dto = new List<RegionDto>();
             foreach(var region in regionsEntity)
             {
@@ -52,7 +56,7 @@ namespace NZWalks.API.Controllers
         [HttpGet("GetRegionById/{id}")]
         public async Task<IActionResult> GetById(Guid id) {
             // Region region = await _context.Regions.FirstOrDefault(r => r.Id == id); when not using await
-            Region region = await _context.Regions.FirstOrDefaultAsync(r => r.Id == id);
+            Region region = await _regionRepository.GetByIdAsync(id);
             if(region is null)
             {
                 return NotFound("No region with such id found.");
@@ -82,7 +86,7 @@ namespace NZWalks.API.Controllers
                 RegionImageUrl = dto.RegionImageUrl
             };
             // _context.Regions.Add(region); when not using await
-            await _context.Regions.AddAsync(region);
+            region = await _regionRepository.AddRegionAsync(region);
             await _context.SaveChangesAsync();
             var regionDto = new RegionDto
             {
@@ -102,15 +106,17 @@ namespace NZWalks.API.Controllers
         [HttpPut("UpdateRegion/{id}")]
         public async Task<IActionResult> UpdateRegion(Guid id, UpdateRegionDto dto)
         {
-            Region region = await _context.Regions.FirstOrDefaultAsync(x  => x.Id == id);
+            var region = new Region
+            {
+                Code = dto.Code, 
+                Name = dto.Name,
+                RegionImageUrl = dto.RegionImageUrl
+            };
+            region = await _regionRepository.UpdateAsync(id, region);
             if(region is null)
             {
                 return NotFound("No region found.");
             }
-            region.Code = dto.Code;
-            region.Name = dto.Name;
-            region.RegionImageUrl = dto.RegionImageUrl;
-            await _context.SaveChangesAsync();
             var regionDto = new RegionDto
             {
                 Id = region.Id,
@@ -118,7 +124,7 @@ namespace NZWalks.API.Controllers
                 Name = region.Name,
                 RegionImageUrl = region.RegionImageUrl
             };
-            return Ok();
+            return Ok(regionDto);
         }
 
         
@@ -130,14 +136,13 @@ namespace NZWalks.API.Controllers
         [HttpDelete("DeleteRegion/{id}")]
         public async Task<IActionResult> DeleteRegion(Guid id)
         {
-            Region region = await _context.Regions.FirstOrDefaultAsync(x => x.Id == id);
+            // no async method for remove, just named it like that in the repository 
+            Region region = await _regionRepository.DeleteRegionAsync(id);
             if(region is null)
             {
                 return NotFound("No such region.");
             }
             // no async method for remove
-            _context.Regions.Remove(region);
-            await _context.SaveChangesAsync();
             return Ok();
 
         }
