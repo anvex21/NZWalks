@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NZWalks.API.CustomActionFilters;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTOs;
 using NZWalks.API.Repositories;
@@ -24,19 +25,14 @@ namespace NZWalks.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("AddWalk")]
+        [ValidateModel]
         public async Task<IActionResult> AddWalk(WalkCreateDto dto)
         {
-            if (ModelState.IsValid)
-            {
-                // map dto to entity
-                var walk = mapper.Map<Walk>(dto);
-                await walkRepository.AddWalkAsync(walk);
-                return Ok(mapper.Map<WalkDto>(walk));
-            }
-            else
-            {
-                return BadRequest(ModelState);
-            }
+
+            // map dto to entity
+            var walk = mapper.Map<Walk>(dto);
+            await walkRepository.AddWalkAsync(walk);
+            return Ok(mapper.Map<WalkDto>(walk));
 
         }
 
@@ -59,7 +55,7 @@ namespace NZWalks.API.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             Walk? walk = await walkRepository.GetByIdAsync(id);
-            if(walk is null)
+            if (walk is null)
             {
                 return NotFound("No walk found");
             }
@@ -73,25 +69,18 @@ namespace NZWalks.API.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("UpdateWalk/{id}")]
+        [ValidateModel]
         public async Task<IActionResult> UpdateWalk(Guid id, UpdateWalkDto dto)
         {
-            if(ModelState.IsValid)
+            Walk? walk = mapper.Map<Walk>(dto);
+            walk = await walkRepository.UpdateWalkAsync(id, walk);
+            if (walk is null)
             {
-                Walk? walk = mapper.Map<Walk>(dto);
-                walk = await walkRepository.UpdateWalkAsync(id, walk);
-                if (walk is null)
-                {
-                    return NotFound("No walk found.");
-                }
-                return Ok(mapper.Map<WalkDto>(walk));
+                return NotFound("No walk found.");
             }
-            else
-            {
-                return NotFound(ModelState);
-            }
-
+            return Ok(mapper.Map<WalkDto>(walk));
         }
-        
+
         /// <summary>
         /// Deletes a walk
         /// </summary>
@@ -101,7 +90,7 @@ namespace NZWalks.API.Controllers
         public async Task<IActionResult> DeleteWalk(Guid id)
         {
             Walk? walk = await walkRepository.DeleteWalkAsync(id);
-            if(walk is null)
+            if (walk is null)
             {
                 return NotFound("No walk found.");
             }

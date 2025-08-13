@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.Configuration;
+using NZWalks.API.CustomActionFilters;
 using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTOs;
@@ -30,13 +31,13 @@ namespace NZWalks.API.Controllers
         /// Get all regions
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GetAllRegions")] 
+        [HttpGet("GetAllRegions")]
         public async Task<IActionResult> GetAll()
         {
             //List<Region> regionsEntity = await _context.Regions.ToList(); when not using await 
             List<Region> regionsEntity = await _regionRepository.GetAllAsync();
             List<RegionDto> dto = _mapper.Map<List<RegionDto>>(regionsEntity);
-            if(!dto.Any())
+            if (!dto.Any())
             {
                 return NotFound("No regions found.");
             }
@@ -49,10 +50,11 @@ namespace NZWalks.API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("GetRegionById/{id}")]
-        public async Task<IActionResult> GetById(Guid id) {
+        public async Task<IActionResult> GetById(Guid id)
+        {
             // Region region = await _context.Regions.FirstOrDefault(r => r.Id == id); when not using await
             Region region = await _regionRepository.GetByIdAsync(id);
-            if(region is null)
+            if (region is null)
             {
                 return NotFound("No region with such id found.");
             }
@@ -65,20 +67,17 @@ namespace NZWalks.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("AddRegion")]
+        [ValidateModel]
         public async Task<IActionResult> AddRegion(RegionCreateDto dto)
         {
-            if (ModelState.IsValid)
-            {
-                // map dto to entity
-                Region region = _mapper.Map<Region>(dto);
-                // _context.Regions.Add(region); when not using await
-                region = await _regionRepository.AddRegionAsync(region);
-                await _context.SaveChangesAsync();
-                // map entity to dto
-                RegionDto regionDto = _mapper.Map<RegionDto>(region);
-                return CreatedAtAction(nameof(GetById), new { id = regionDto.Id }, regionDto);
-            }
-            return BadRequest(ModelState);
+            // map dto to entity
+            Region region = _mapper.Map<Region>(dto);
+            // _context.Regions.Add(region); when not using await
+            region = await _regionRepository.AddRegionAsync(region);
+            await _context.SaveChangesAsync();
+            // map entity to dto
+            RegionDto regionDto = _mapper.Map<RegionDto>(region);
+            return CreatedAtAction(nameof(GetById), new { id = regionDto.Id }, regionDto);
         }
 
         /// <summary>
@@ -87,27 +86,21 @@ namespace NZWalks.API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut("UpdateRegion/{id}")]
+        [ValidateModel]
         public async Task<IActionResult> UpdateRegion(Guid id, UpdateRegionDto dto)
         {
-            if (ModelState.IsValid)
+            Region? region = _mapper.Map<Region>(dto);
+            region = await _regionRepository.UpdateAsync(id, region);
+            if (region is null)
             {
-                Region? region = _mapper.Map<Region>(dto);
-                region = await _regionRepository.UpdateAsync(id, region);
-                if (region is null)
-                {
-                    return NotFound("No region found.");
-                }
-                var regionDto = _mapper.Map<RegionDto>(region);
-                return Ok(regionDto);
+                return NotFound("No region found.");
             }
-            else
-            {
-                return BadRequest(ModelState);
-            }
+            var regionDto = _mapper.Map<RegionDto>(region);
+            return Ok(regionDto);
         }
 
 
-        
+
         /// <summary>
         /// Deletes a region
         /// </summary>
@@ -118,7 +111,7 @@ namespace NZWalks.API.Controllers
         {
             // no async method for remove, just named it like that in the repository 
             Region region = await _regionRepository.DeleteRegionAsync(id);
-            if(region is null)
+            if (region is null)
             {
                 return NotFound("No such region.");
             }
