@@ -22,7 +22,34 @@ namespace NZWalks.API.Repositories
         public async Task<List<Walk>> GetAllAsync()
         {
             // return await context.Walks.Include(x => x.Difficulty).Include(x => x.Region).ToListAsync(); -> same thing
-            return await context.Walks.Include("Difficulty").Include("Region").ToListAsync();
+            return await context.Walks.
+                Include("Difficulty").
+                Include("Region").
+                ToListAsync();
+        }
+
+        public async Task<Walk?> GetByIdAsync(Guid id)
+        {
+            return await context.Walks.
+                Include("Difficulty").
+                Include("Region").
+                FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<Walk?> UpdateWalkAsync(Guid id, Walk walk)
+        {
+            var existingWalk = await context.Walks.FirstOrDefaultAsync(x => x.Id == id);
+            if(existingWalk is null) {
+                return null;
+            }
+            existingWalk.Name = walk.Name;
+            existingWalk.Description = walk.Description;
+            existingWalk.LengthInKm = walk.LengthInKm;
+            existingWalk.WalkImageUrl = walk.WalkImageUrl;
+            existingWalk.DifficultyId = walk.DifficultyId;
+            existingWalk.RegionId = walk.RegionId;
+            await context.SaveChangesAsync();
+            return existingWalk;
         }
     }
 }
