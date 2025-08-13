@@ -32,5 +32,20 @@ namespace NZWalks.API.Controllers
             return Ok(mapper.Map<WalkDto>(walk));
 
         }
+
+        /// <summary>
+        /// Get all walks, including info about difficulty and region
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetAllWalks")]
+        public async Task<IActionResult> GetAllWalks()
+        {
+            List<Walk> walks = await walkRepository.GetAllAsync();
+            if (!walks.Any())
+            {
+                return NotFound("No walks available.");
+            }
+            return Ok(walks);
+        }
     }
 }
