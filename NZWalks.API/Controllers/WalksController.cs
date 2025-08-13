@@ -26,10 +26,17 @@ namespace NZWalks.API.Controllers
         [HttpPost("AddWalk")]
         public async Task<IActionResult> AddWalk(WalkCreateDto dto)
         {
-            // map dto to entity
-            var walk = mapper.Map<Walk>(dto);
-            await walkRepository.AddWalkAsync(walk);
-            return Ok(mapper.Map<WalkDto>(walk));
+            if (ModelState.IsValid)
+            {
+                // map dto to entity
+                var walk = mapper.Map<Walk>(dto);
+                await walkRepository.AddWalkAsync(walk);
+                return Ok(mapper.Map<WalkDto>(walk));
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
 
         }
 
@@ -68,16 +75,28 @@ namespace NZWalks.API.Controllers
         [HttpPut("UpdateWalk/{id}")]
         public async Task<IActionResult> UpdateWalk(Guid id, UpdateWalkDto dto)
         {
-            Walk? walk = mapper.Map<Walk>(dto);
-            walk = await walkRepository.UpdateWalkAsync(id, walk);
-            if (walk is null)
+            if(ModelState.IsValid)
             {
-                return NotFound("No walk found.");
+                Walk? walk = mapper.Map<Walk>(dto);
+                walk = await walkRepository.UpdateWalkAsync(id, walk);
+                if (walk is null)
+                {
+                    return NotFound("No walk found.");
+                }
+                return Ok(mapper.Map<WalkDto>(walk));
             }
-            return Ok(mapper.Map<WalkDto>(walk));
+            else
+            {
+                return NotFound(ModelState);
+            }
 
         }
-
+        
+        /// <summary>
+        /// Deletes a walk
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("DeleteWalk/{id}")]
         public async Task<IActionResult> DeleteWalk(Guid id)
         {

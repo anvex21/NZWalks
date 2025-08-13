@@ -67,14 +67,18 @@ namespace NZWalks.API.Controllers
         [HttpPost("AddRegion")]
         public async Task<IActionResult> AddRegion(RegionCreateDto dto)
         {
-            // map dto to entity
-            Region region = _mapper.Map<Region>(dto);
-            // _context.Regions.Add(region); when not using await
-            region = await _regionRepository.AddRegionAsync(region);
-            await _context.SaveChangesAsync();
-            // map entity to dto
-            RegionDto regionDto = _mapper.Map<RegionDto>(region);
-            return CreatedAtAction(nameof(GetById),new {id = regionDto.Id}, regionDto);
+            if (ModelState.IsValid)
+            {
+                // map dto to entity
+                Region region = _mapper.Map<Region>(dto);
+                // _context.Regions.Add(region); when not using await
+                region = await _regionRepository.AddRegionAsync(region);
+                await _context.SaveChangesAsync();
+                // map entity to dto
+                RegionDto regionDto = _mapper.Map<RegionDto>(region);
+                return CreatedAtAction(nameof(GetById), new { id = regionDto.Id }, regionDto);
+            }
+            return BadRequest(ModelState);
         }
 
         /// <summary>
@@ -85,15 +89,23 @@ namespace NZWalks.API.Controllers
         [HttpPut("UpdateRegion/{id}")]
         public async Task<IActionResult> UpdateRegion(Guid id, UpdateRegionDto dto)
         {
-            Region? region = _mapper.Map<Region>(dto);
-            region = await _regionRepository.UpdateAsync(id, region);
-            if(region is null)
+            if (ModelState.IsValid)
             {
-                return NotFound("No region found.");
+                Region? region = _mapper.Map<Region>(dto);
+                region = await _regionRepository.UpdateAsync(id, region);
+                if (region is null)
+                {
+                    return NotFound("No region found.");
+                }
+                var regionDto = _mapper.Map<RegionDto>(region);
+                return Ok(regionDto);
             }
-            var regionDto = _mapper.Map<RegionDto>(region);
-            return Ok(regionDto);
+            else
+            {
+                return BadRequest(ModelState);
+            }
         }
+
 
         
         /// <summary>
