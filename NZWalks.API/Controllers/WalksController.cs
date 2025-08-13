@@ -51,7 +51,7 @@ namespace NZWalks.API.Controllers
         [HttpGet("GetWalkById/{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var walk = await walkRepository.GetByIdAsync(id);
+            Walk? walk = await walkRepository.GetByIdAsync(id);
             if(walk is null)
             {
                 return NotFound("No walk found");
@@ -59,10 +59,16 @@ namespace NZWalks.API.Controllers
             return Ok(walk);
         }
 
+        /// <summary>
+        /// Updates a walk
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPut("UpdateWalk/{id}")]
         public async Task<IActionResult> UpdateWalk(Guid id, UpdateWalkDto dto)
         {
-            var walk = mapper.Map<Walk>(dto);
+            Walk? walk = mapper.Map<Walk>(dto);
             walk = await walkRepository.UpdateWalkAsync(id, walk);
             if (walk is null)
             {
@@ -70,6 +76,17 @@ namespace NZWalks.API.Controllers
             }
             return Ok(mapper.Map<WalkDto>(walk));
 
+        }
+
+        [HttpDelete("DeleteWalk/{id}")]
+        public async Task<IActionResult> DeleteWalk(Guid id)
+        {
+            Walk? walk = await walkRepository.DeleteWalkAsync(id);
+            if(walk is null)
+            {
+                return NotFound("No walk found.");
+            }
+            return Ok(mapper.Map<WalkDto>(walk));
         }
     }
 }
