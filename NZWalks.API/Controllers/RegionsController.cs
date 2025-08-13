@@ -1,4 +1,5 @@
-﻿ using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.Configuration;
@@ -15,10 +16,14 @@ namespace NZWalks.API.Controllers
     {
         private readonly NZWalksDbContext _context;
         private readonly IRegionRepository _regionRepository;
-        public RegionsController(NZWalksDbContext context, IRegionRepository regionRepository)
+        private readonly IMapper _mapper;
+
+        public RegionsController(NZWalksDbContext context, IRegionRepository regionRepository, IMapper mapper)
         {
+
             _context = context;
             _regionRepository = regionRepository;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -30,17 +35,7 @@ namespace NZWalks.API.Controllers
         {
             //List<Region> regionsEntity = await _context.Regions.ToList(); when not using await 
             List<Region> regionsEntity = await _regionRepository.GetAllAsync();
-            List<RegionDto> dto = new List<RegionDto>();
-            foreach(var region in regionsEntity)
-            {
-                dto.Add(new RegionDto()
-                {
-                    Id = region.Id,
-                    Code = region.Code,
-                    Name = region.Name,
-                    RegionImageUrl = region.RegionImageUrl
-                }); 
-            }
+            List<RegionDto> dto = _mapper.Map<List<RegionDto>>(regionsEntity);
             if(!dto.Any())
             {
                 return NotFound("No regions found.");
@@ -61,13 +56,7 @@ namespace NZWalks.API.Controllers
             {
                 return NotFound("No region with such id found.");
             }
-            RegionDto dto = new RegionDto()
-            {
-                Id = region.Id,
-                Code = region.Code,
-                Name = region.Name,
-                RegionImageUrl = region.RegionImageUrl
-            };
+            RegionDto dto = _mapper.Map<RegionDto>(region);
             return Ok(dto);
         }
 
@@ -79,22 +68,12 @@ namespace NZWalks.API.Controllers
         public async Task<IActionResult> AddRegion(RegionCreateDto dto)
         {
             // map dto to entity
-            var region = new Region
-            {
-                Code = dto.Code,
-                Name = dto.Name,
-                RegionImageUrl = dto.RegionImageUrl
-            };
+            Region region = _mapper.Map<Region>(dto);
             // _context.Regions.Add(region); when not using await
             region = await _regionRepository.AddRegionAsync(region);
             await _context.SaveChangesAsync();
-            var regionDto = new RegionDto
-            {
-                Id = region.Id,
-                Code = region.Code,
-                Name = region.Name,
-                RegionImageUrl = region.RegionImageUrl
-            }; 
+            // map entity to dto
+            RegionDto regionDto = _mapper.Map<RegionDto>(region);
             return CreatedAtAction(nameof(GetById),new {id = regionDto .Id}, regionDto);
         }
 
@@ -106,24 +85,13 @@ namespace NZWalks.API.Controllers
         [HttpPut("UpdateRegion/{id}")]
         public async Task<IActionResult> UpdateRegion(Guid id, UpdateRegionDto dto)
         {
-            var region = new Region
-            {
-                Code = dto.Code, 
-                Name = dto.Name,
-                RegionImageUrl = dto.RegionImageUrl
-            };
+            Region? region = _mapper.Map<Region>(dto);
             region = await _regionRepository.UpdateAsync(id, region);
             if(region is null)
             {
                 return NotFound("No region found.");
             }
-            var regionDto = new RegionDto
-            {
-                Id = region.Id,
-                Code = region.Code,
-                Name = region.Name,
-                RegionImageUrl = region.RegionImageUrl
-            };
+            var regionDto = _mapper.Map<RegionDto>(region);
             return Ok(regionDto);
         }
 
