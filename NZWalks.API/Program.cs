@@ -31,6 +31,7 @@ namespace NZWalks.API
 
             builder.Services.AddScoped<IRegionRepository, RegionRepository>();
             builder.Services.AddScoped<IWalkRepository, WalkRepository>();
+            builder.Services.AddScoped<ITokenRepository, TokenRepository>();
             // adding automapper, the new way
             builder.Services.AddAutoMapper(cgf => { cgf.AddProfile<AutomapperProfiles>(); });
 

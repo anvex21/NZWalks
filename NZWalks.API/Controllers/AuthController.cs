@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.Models.DTOs;
+using NZWalks.API.Repositories;
 
 namespace NZWalks.API.Controllers
 {
@@ -10,10 +11,12 @@ namespace NZWalks.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<IdentityUser> userManager;
+        private readonly ITokenRepository tokenRepository;
 
-        public AuthController(UserManager<IdentityUser> userManager)
+        public AuthController(UserManager<IdentityUser> userManager, ITokenRepository tokenRepository)
         {
             this.userManager = userManager;
+            this.tokenRepository = tokenRepository;
         }
         /// <summary>
         /// Register a user
@@ -43,6 +46,35 @@ namespace NZWalks.API.Controllers
                 
             }
             return BadRequest("Something went wrong.");
-        } 
+        }
+
+
+        /// <summary>
+        /// Logs in a user
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(LoginRequestDto dto)
+        {
+            IdentityUser? user = await userManager.FindByEmailAsync(dto.Username);
+            if (user is not null) {
+                bool checkPassword = await userManager.CheckPasswordAsync(user, dto.Password);
+                if (checkPassword)
+                {
+                    IList<string> roles = await userManager.GetRolesAsync(user);
+                    if(roles is not null)
+                    {
+                        //Create a token
+                        string jwtToken = tokenRepository.CreateJWTToken(user, roles.ToList());
+                        LoginResponseDto response = new LoginResponseDto
+                        {
+                            JwtToken = jwtToken
+                        };
+                        return Ok(response);
+                    }
+                }
+            }
+            return BadRequest("Username or password incorrect.");
+        }
     }
 }
