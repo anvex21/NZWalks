@@ -23,6 +23,8 @@ namespace NZWalks.API
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<NZWalksDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddDbContext<NZWalksAuthDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionAuth")));
             builder.Services.AddScoped<IRegionRepository, RegionRepository>();
             builder.Services.AddScoped<IWalkRepository, WalkRepository>();
             // adding automapper, the new way
