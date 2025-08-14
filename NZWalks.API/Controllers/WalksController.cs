@@ -41,9 +41,13 @@ namespace NZWalks.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetAllWalks")]
-        public async Task<IActionResult> GetAllWalks(string? filterOn, string? filterQuery, string? sortBy, bool isAscending)
+        public async Task<IActionResult> GetAllWalks(string? filterOn, string? filterQuery, 
+            string? sortBy, bool isAscending,
+            int pageNumber = 1, int pageSize = 1000)
         {
-            List<Walk> walks = await walkRepository.GetAllAsync(filterOn, filterQuery, sortBy, isAscending);
+            List<Walk> walks = await walkRepository.GetAllAsync(filterOn, filterQuery, 
+                sortBy, isAscending,
+                pageNumber, pageSize);
             if (!walks.Any())
             {
                 return NotFound("No walks available.");
