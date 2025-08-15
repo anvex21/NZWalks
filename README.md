@@ -48,6 +48,7 @@ Architecture & Tools:
   ```bash
   "ConnectionStrings": {
       "DefaultConnection": "Your-connection-string-here"
+      "DefaultConnectionAuth": "Your-connection-string-here"
   }
   ```
 
