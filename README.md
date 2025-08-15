@@ -7,24 +7,24 @@ It supports secure user authentication, region and walk CRUD operations, and inc
 ---
 
 ## Features
-- User Authentication & Authorization: 
-Uses ASP.NET Core Identity and JWT tokens for secure access to API endpoints.
+User Authentication & Authorization: 
+- Uses ASP.NET Core Identity and JWT tokens for secure access to API endpoints.
 
-- Domain Functionality:
-RegionsController: Create, read, update, and delete region data.
+Domain Functionality:
+- RegionsController: Create, read, update, and delete region data.
 
-WalksController: Manage walking trails with support for filtering and pagination.
+- WalksController: Manage walking trails with support for filtering and pagination.
 
-ImageController: Handles image uploads associated with walks.
+- ImageController: Handles image uploads associated with walks.
 
-- Architecture & Tools:
-Entity Framework Core for ORM and data migrations.
+Architecture & Tools:
+- Entity Framework Core for ORM and data migrations.
 
-Repository Pattern to abstract data access logic.
+- Repository Pattern to abstract data access logic.
 
-AutoMapper for mapping between domain models and DTOs.
+- AutoMapper for mapping between entities and DTOs.
 
-Swagger (Swashbuckle) for auto-generated API documentation.
+- Swagger (Swashbuckle) for auto-generated API documentation.
 
 ---
 
