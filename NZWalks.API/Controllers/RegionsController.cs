@@ -71,8 +71,8 @@ namespace NZWalks.API.Controllers
         /// Adds a new region
         /// </summary>
         /// <returns></returns>
-        //[HttpPost("AddRegion")]
-        [Authorize(Roles = "Writer")]
+        [HttpPost("AddRegion")]
+        //[Authorize(Roles = "Writer")]
         [ValidateModel]
 
         public async Task<IActionResult> AddRegion(RegionCreateDto dto)
@@ -93,8 +93,8 @@ namespace NZWalks.API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         
-        //[HttpPut("UpdateRegion/{id}")]
-        [Authorize(Roles = "Writer")]
+        [HttpPut("UpdateRegion/{id}")]
+        //[Authorize(Roles = "Writer")]
         [ValidateModel]
         public async Task<IActionResult> UpdateRegion(Guid id, UpdateRegionDto dto)
         {
@@ -116,8 +116,8 @@ namespace NZWalks.API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         
-        //[HttpDelete("DeleteRegion/{id}")]
-        [Authorize(Roles = "Writer")]
+        [HttpDelete("DeleteRegion/{id}")]
+        //[Authorize(Roles = "Writer")]
         // for both roles - [Authorize(Roles = "Writer,Reader")]
         public async Task<IActionResult> DeleteRegion(Guid id)
         {
