@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NZWalks.API.Models.Domain;
+using NZWalks.API.Models.Entities;
 
 namespace NZWalks.API.Data
 {
@@ -24,6 +25,12 @@ namespace NZWalks.API.Data
         /// DbSet Walks
         /// </summary>
         public DbSet<Walk> Walks { get; set; }
+
+
+        /// <summary>
+        /// DbSet Images 
+        /// </summary>
+        public DbSet<Image> Images { get; set; }
 
         /// <summary>
         /// Seeding data for test purposes
