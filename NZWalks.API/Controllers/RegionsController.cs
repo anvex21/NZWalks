@@ -35,7 +35,7 @@ namespace NZWalks.API.Controllers
         /// <returns></returns>
       
         [HttpGet("GetAllRegions")]
-        [Authorize(Roles = "Reader")]
+        //[Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetAll()
         {
             //List<Region> regionsEntity = await _context.Regions.ToList(); when not using await 
@@ -53,7 +53,7 @@ namespace NZWalks.API.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Reader")]
+        //[Authorize(Roles = "Reader")]
         [HttpGet("GetRegionById/{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -71,7 +71,7 @@ namespace NZWalks.API.Controllers
         /// Adds a new region
         /// </summary>
         /// <returns></returns>
-        [HttpPost("AddRegion")]
+        //[HttpPost("AddRegion")]
         [Authorize(Roles = "Writer")]
         [ValidateModel]
 
@@ -93,7 +93,7 @@ namespace NZWalks.API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         
-        [HttpPut("UpdateRegion/{id}")]
+        //[HttpPut("UpdateRegion/{id}")]
         [Authorize(Roles = "Writer")]
         [ValidateModel]
         public async Task<IActionResult> UpdateRegion(Guid id, UpdateRegionDto dto)
@@ -116,7 +116,7 @@ namespace NZWalks.API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         
-        [HttpDelete("DeleteRegion/{id}")]
+        //[HttpDelete("DeleteRegion/{id}")]
         [Authorize(Roles = "Writer")]
         // for both roles - [Authorize(Roles = "Writer,Reader")]
         public async Task<IActionResult> DeleteRegion(Guid id)
